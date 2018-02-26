@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Facebook Login JavaScript Example</title>
+				<meta charset="UTF-8">
+		<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script
+        src="http://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+				<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+				
+        <link rel="stylesheet" href="assets/style.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+    <body>
+        <!--
+        Below we include the Login Button social plugin. This button uses
+        the JavaScript SDK to present a graphical Login button that triggers
+        the FB.login() function when clicked.
+				-->
+
+        <nav class="navbar navbar-light bg-light justify-content-between">
+            <a class="navbar-brand" style="font-size: 60px">toodoo</a>
+						<button id="loggedIn" class="btn btn-outline-success my-2 my-sm-0" type="button" data-toggle="modal" data-target="#signInModal">Login / Register</button>
+						<button id="loggedOut" class="btn btn-outline-danger my-2 my-sm-0" type="button" onclick="logOut()">Log Out</button>
+        </nav>
+
+        <!-- Modal Sign In-->
+        <div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Sign In</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Username</label>
+                                <input id="usernameIn" type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter email">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Password</label>
+                                <input id="passwordIn" type="password" class="form-control" placeholder="Password">
+							</div>
+							<div id="wrongPassword" class="alert alert-danger" role="alert">
+								Your username/password is invalid
+							</div>
+							<div id="valid" class="alert alert-success" role="alert">
+								Login success
+							</div>
+								<button type="button" class="btn btn-primary" onclick="signIn()">Submit</button> 
+								
+								<button class="btn btn-primary" type="button" data-toggle="modal" data-target="#signUpModal">Register</button>
+								<p>or login using</p>
+								<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+								</fb:login-button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Register -->
+        <div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Register</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Username</label>
+								<input id="usernameUp" type="text" class="form-control" placeholder="Enter Username">
+							<div id="alreadyUsed" class="alert alert-danger" role="alert">
+								This Username has already been used
+							</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Email</label>
+                                <input id="emailUp" type="email" class="form-control" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Password</label>
+                                <input id="passwordUp" type="password" class="form-control" placeholder="Password">
+                            </div>
+                                <button type="button" class="btn btn-primary" onclick="signUp()">Submit</button> 
+                        </form>
+                    </div>
+                </div>
+            </div>
+		</div>
+
+		<!-- jumbotron -->
+		<div class="jumbotron jumbotron-fluid" id="quote">
+			<div class="container">
+				<h1 id="quote"class="display-4">TooDoo</h1>
+				<p id="quote"class="lead">What are you going to do today?</p>
+			</div>
+		</div>
+		<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+			<ol class="carousel-indicators">
+				<li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+				<li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+				<li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+			</ol>
+			<div class="carousel-inner" id="carosel">
+				<div class="carousel-item active">
+					<img class="d-block w-100" src="https://images3.alphacoders.com/853/thumb-1920-85305.jpg" alt="First slide">
+					<div class="carousel-caption d-none d-md-block">
+						<h4>Stay Positive</h4>
+					</div>
+				</div>
+				<div class="carousel-item" id="carosel">
+					<img class="d-block w-100" src="https://images7.alphacoders.com/411/thumb-1920-411820.jpg" alt="Second slide">
+					<div class="carousel-caption d-none d-md-block">
+						<h4>Forgive yourself for your faults and your mistakes and move on</h4>
+					</div>
+				</div>
+				<div class="carousel-item" id="carosel">
+					<img class="d-block w-100" src="https://images2.alphacoders.com/521/thumb-1920-521718.jpg" alt="Third slide">
+					<div class="carousel-caption d-none d-md-block">
+						<h4>Stay Positive</h4>
+					</div>
+				</div>
+			</div>
+			<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="sr-only">Previous</span>
+			</a>
+			<a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="sr-only">Next</span>
+			</a>
+		</div>
+
+
+			<!-- todoList -->
+	
+		<div class="row" id="getAllTask">
+			
+			<div class="col-sm-4">
+				<div class="row">
+					<div class="jumbotron jumbotron-fluid" style="width: 18em;">
+						<div class="container">
+							<div class="row offset-sm-1">
+								<h3 class="display-4">{{timeNow.time}}</h3>
+								<h4>{{timeNow.period}}</h4>
+							</div>
+							<div class="row offset-sm-1">
+								<h3>{{timeNow.day}}, {{timeNow.date}}{{timeNow.month}} {{timeNow.year}}</h3>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="card" style="width: 18em;">
+						<div class="card-header">
+							<button type="button" class="btn btn-light" data-toggle="modal" data-target="#modalAddTask" >
+								<a href="#modalAddTask" class="card-link">+Add new task</a>
+							</button>
+						</div>
+						<div class="card-body">
+							<h5 class="card-title">Today, you are going to:</h5>
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item" v-for="(theTask, index) in allTask" :key="theTask._id">
+									<form class="form-group">
+										<div v-if="theTask.isDone === true" style="text-decoration: line-through">
+											<input type="checkbox" aria-label="Checkbox for following text input" v-model="theTask.isDone" checked>
+												{{theTask.todo}}
+										</div>
+										<div v-else-if="theTask.isDone === false">
+											<input type="checkbox" aria-label="Checkbox for following text input" v-model="theTask.isDone">
+												{{theTask.todo}}
+										</div>
+										<button type="button" class="btn btn-success btn-sm" @click="getDone(theTask._id, theTask.todo ,theTask.isDone)">Edit</button>
+										<button type="button" class="btn btn-danger btn-sm" @click="deleteTask(theTask._id)">Delete</button>
+									</form>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			
+
+				<!-- modal AddTask -->
+				<div class="modal fade" id="modalAddTask" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<div class="form-group">
+									<input type="email" class="form-control" id="exampleInputTask" aria-describedby="emailHelp" placeholder="What are you going to do today?">
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-primary" @click="addTask()">Add Task</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- News -->
+			<div class="col-sm-8" id="allTask">
+				<ul class="list-group list-group-flush" v-for="news in allNews" :key=>
+					<li class="list-group-item">
+						<div class="card" style="width: 100%;">
+							<div class="card-body">
+								<a :href="news.url"><h5 class="card-title">{{news.title}}</h5></a>
+								<p class="card-text">{{news.publishedAt}}</p>
+							</div>
+							<img class="card-img-top" :src="news.urlToImage" alt="Card image cap">
+							<div class="card-body">
+								<p class="card-text">{{news.description}}</p>
+								<p class="card-text">{{news.source.name}}</p>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>				
+		<footer>
+			<div class="container text-center">
+				<p class="text-center" style="color: white;">Made By Heraldo Yusron</p>	
+			</div>
+		</footer>
+		<script>
+				$(document).ready(function(){
+					console.log(localStorage.getItem('status'))
+					if(localStorage.getItem('status') === 'connected'){
+						$("#loggedIn").hide();
+						$('#loggedOut').show();
+						$("#carouselExampleIndicators").hide()
+						$("#allTask").show()
+						$("#getAllTask").show()
+						$("#quote").hide()
+					}else{
+						$("#loggedIn").show();
+						$("#carouselExampleIndicators").show()
+						$('#loggedOut').hide();
+						$("#alreadyUsed").hide()
+						$("#wrongPassword").hide()
+						$("#valid").hide()
+						$("#allTask").hide()
+						$("#getAllTask").hide()
+						$("#quote").show()
+					}
+					
+					$('#myModal').on('shown.bs.modal', function () {
+						$('#myInput').trigger('focus')
+					})
+				});
+		</script>
+        <script src="assets/facebook.js"></script>
+	</body>
+	
+</html>
